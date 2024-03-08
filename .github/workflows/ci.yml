@@ -17,39 +17,39 @@ jobs:
     name: Build Windows
     uses: ./.github/workflows/build-native.yml
     with:
-     runner: windows-latest
-     binary: windows
-     build: '["windows"]'
+      runner: windows-latest
+      binary: windows
+      build: '["windows"]'
 
   build-macos:
     name: Build MacOS
     uses: ./.github/workflows/build-native.yml
     with:
-     runner: macos-latest
-     binary: macos
-     build: '["macos"]'
+      runner: macos-14
+      binary: macos
+      build: '["macos"]'
 
   build-linux:
     name: Build Linux
     uses: ./.github/workflows/build-native.yml
     with:
-     runner: ubuntu-20.04 # Building on the lowest possible Linux (Ubuntu) version for compatibility
-     binary: linux
-     build: '["linux"]'
+      runner: ubuntu-20.04 # Building on the lowest possible Linux (Ubuntu) version for compatibility
+      binary: linux
+      build: '["linux"]'
 
   build-android:
     name: Build Android
     uses: ./.github/workflows/build-native.yml
     with:
-     runner: ubuntu-20.04
-     binary: android
-     build: '["android-x86", "android-x86_64", "android-armeabi-v7a", "android-arm64-v8a"]'
+      runner: ubuntu-20.04
+      binary: android
+      build: '["android-x86", "android-x86_64", "android-armeabi-v7a", "android-arm64-v8a"]'
 
   build-ios:
     name: Build IOS
     uses: ./.github/workflows/build-native.yml
     with:
-      runner: macos-latest
+      runner: macos-14
       binary: ios
       build: '["ios-device", "ios-simulator", "ios-catalyst"]'
 
@@ -63,7 +63,7 @@ jobs:
     needs: build-ios
     uses: ./.github/workflows/binary-combine-ios.yml
 
-# Dart jobs
+  # Dart jobs
 
   deploy-cluster-dart-windows:
     name: Deploy Cluster for Dart Windows
@@ -80,7 +80,6 @@ jobs:
       - deploy-cluster-dart-windows
     secrets: inherit
     with:
-      os: windows
       runner: windows-latest
       differentiator: dw${{ github.run_id }}${{ github.run_attempt }}
 
@@ -109,8 +108,7 @@ jobs:
       - deploy-cluster-dart-macos
     secrets: inherit
     with:
-      os: macos
-      runner: macos-latest
+      runner: macos-13
       differentiator: dm${{ github.run_id }}${{ github.run_attempt }}
 
   cleanup-cluster-dart-macos:
@@ -138,9 +136,7 @@ jobs:
       - deploy-cluster-dart-macos-arm
     secrets: inherit
     with:
-      os: macos
       runner: macos-14
-      architecture: arm
       differentiator: dma${{ github.run_id }}${{ github.run_attempt }}
 
   cleanup-cluster-dart-macos-arm:
@@ -168,7 +164,6 @@ jobs:
       - deploy-cluster-dart-linux
     secrets: inherit
     with:
-      os: linux
       runner: ubuntu-latest
       differentiator: dl${{ github.run_id }}${{ github.run_attempt }}
 
@@ -182,7 +177,7 @@ jobs:
     with:
       differentiator: dl${{ github.run_id }}${{ github.run_attempt }}
 
-# Flutter jobs
+  # Flutter jobs
   deploy-cluster-flutter-windows:
     name: Deploy Cluster for Flutter Windows
     uses: ./.github/workflows/deploy-baas.yml
@@ -201,7 +196,6 @@ jobs:
       os: windows
       runner: windows-latest
       differentiator: fw${{ github.run_id }}${{ github.run_attempt }}
-
 
   cleanup-cluster-flutter-windows:
     name: Cleanup Cluster for Flutter Windows
@@ -229,7 +223,7 @@ jobs:
     secrets: inherit
     with:
       os: macos
-      runner: macos-13 # workaround to: https://github.com/flutter/flutter/issues/118469 latest is still macos-12 ¯\_(ツ)_/¯
+      runner: macos-14
       differentiator: fm${{ github.run_id }}${{ github.run_attempt }}
 
   cleanup-cluster-flutter-macos:
@@ -279,7 +273,7 @@ jobs:
       differentiator: fi${{ github.run_id }}${{ github.run_attempt }}
 
   flutter-tests-ios:
-    runs-on: macos-latest
+    runs-on: macos-14
     name: Flutter Tests iOS
     timeout-minutes: 45
     needs:
@@ -296,7 +290,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
+
+      - name: Select XCode for MacOS
+        run: |
+          xcodes installed
+          sudo xcodes select 15.3
 
       - name: Enable ccache
         run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" >> $GITHUB_ENV
@@ -310,7 +309,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
 
       - name: Setup Melos
         run: |
@@ -323,9 +322,9 @@ jobs:
       - name: Launch Simulator
         uses: futureware-tech/simulator-action@v3
         with:
-          model: 'iPhone SE (3rd generation)'
-          os: 'iOS'
-          os_version: '>= 14.0'
+          model: "iPhone SE (3rd generation)"
+          os: "iOS"
+          os_version: ">= 14.0"
 
       - name: Run tests on iOS Simulator
         run: |
@@ -380,7 +379,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
 
       - name: Enable KVM
         run: |
@@ -394,7 +393,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version: 11
 
       - name: Fetch artifacts
@@ -406,7 +405,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
 
       - name: Setup Melos
         run: |
@@ -417,7 +416,7 @@ jobs:
         run: dart pub get
 
       # Hack to free up space on the runner to ensure we have enough diskspace to run the emulator
-      - name: Remove unnecessary files (dotnet, etc.) 
+      - name: Remove unnecessary files (dotnet, etc.)
         run: |
           sudo rm -rf /usr/share/dotnet
 
@@ -466,7 +465,6 @@ jobs:
           only-summary: true
           working-directory: packages/realm/tests
 
-
   cleanup-cluster-flutter-android:
     name: Cleanup Cluster for Flutter Android
     uses: ./.github/workflows/terminate-baas.yml
@@ -477,7 +475,7 @@ jobs:
     with:
       differentiator: fa${{ github.run_id }}${{ github.run_attempt }}
 
-# Generator jobs
+  # Generator jobs
 
   generator:
     strategy:
@@ -497,12 +495,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
 
       - name: Setup Melos
         run: |
@@ -578,7 +576,7 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && github.ref == 'refs/heads/main'
     steps:
-        # Run this action to set env.WORKFLOW_CONCLUSION
+      # Run this action to set env.WORKFLOW_CONCLUSION
       - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5
 
       - uses: act10ns/slack@ed1309ab9862e57e9e583e51c7889486b9a00b0f
@@ -587,7 +585,7 @@ jobs:
         with:
           status: ${{ env.WORKFLOW_CONCLUSION }}
           webhook-url: ${{ secrets.SLACK_DART_WEBHOOK }}
-          channel: '#realm-github-dart'
+          channel: "#realm-github-dart"
           message: |
             *<https://github.com/realm/realm-dart/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}|_{{workflow}}_ run id: ${{ github.run_id }} has status _{{jobStatus}}_ >*
             <{{refUrl}}|`{{ref}}` - {{description}}>

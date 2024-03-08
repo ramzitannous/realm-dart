@@ -18,6 +18,7 @@
 
 ### Internal
 * Using Core 14.5.0.
+* Native library build with XCode 15 for macOS and iOS.
 
 ## 2.0.0 (2024-03-20)
 
