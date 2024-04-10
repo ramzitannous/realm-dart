@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #import "RealmPlugin.h"
-#if __has_include(<realm/realm-Swift.h>)
-#import <realm/realm-Swift.h>
+#if __has_include(<realm_flutter/realm-Swift.h>)
+#import <realm_flutter/realm-Swift.h>
 #else
 // Support project import fallback if the generated compatibility header
 // is not copied when this plugin is created as a library.
